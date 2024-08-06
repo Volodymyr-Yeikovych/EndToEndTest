@@ -80,7 +80,8 @@ public class PersonServiceTest {
         var captor = ArgumentCaptor.forClass(Person.class);
         when(personRepository.add(captor.capture())).thenReturn(person);
 
-        assertThat(personService.add(dto)).isEqualTo(person);
+        Person addedPerson = personService.add(dto);
+        assertThat(addedPerson).isEqualTo(person);
         assertThat(captor.getValue().getName()).isEqualTo(name);
         assertThat(captor.getValue().getEmail()).isEqualTo(email);
     }
@@ -88,13 +89,11 @@ public class PersonServiceTest {
     @Test
     public void shouldThrowIllegalArgumentExceptionForInvalidEmail() {
         var name = "Vasa";
-        var email = "vasa5@gmail.com";
+        var email = "invalid email";
         var dto = new PersonDto(name, email);
-        var captor = ArgumentCaptor.forClass(String.class);
-        when(emailService.isInvalidEmail(captor.capture())).thenReturn(true);
+        when(emailService.isInvalidEmail(email)).thenReturn(true);
 
         var exception = assertThrows(IllegalArgumentException.class, () -> personService.add(dto));
-        assertThat(captor.getValue()).isEqualTo(email);
-        assertThat(exception).hasMessage("Invalid email: [" + captor.getValue() + "].");
+        assertThat(exception).hasMessage("Invalid email: [" + email + "].");
     }
 }
