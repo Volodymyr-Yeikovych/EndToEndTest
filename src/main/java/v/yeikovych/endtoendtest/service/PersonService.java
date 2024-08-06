@@ -20,6 +20,6 @@ public class PersonService {
     }
 
     public void add(PersonDto dto) throws IllegalArgumentException {
-        repository.add(dto.name(), dto.email());
+        repository.add(new Person(0, dto.name(), dto.email()));
     }
 }
