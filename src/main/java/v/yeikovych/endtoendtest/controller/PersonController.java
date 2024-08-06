@@ -1,6 +1,6 @@
 package v.yeikovych.endtoendtest.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,14 +10,10 @@ import v.yeikovych.endtoendtest.service.PersonService;
 
 @RestController
 @RequestMapping("/api/v1/person")
+@RequiredArgsConstructor
 public class PersonController {
 
     private final PersonService service;
-
-    @Autowired
-    public PersonController(PersonService service) {
-        this.service = service;
-    }
 
     @GetMapping("{id}")
     public ResponseEntity<?> getPersonById(@PathVariable int id) {
