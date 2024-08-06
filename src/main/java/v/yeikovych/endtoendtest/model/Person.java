@@ -8,6 +8,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 public class Person {
+
     private UUID id;
     private String name;
     private String email;
