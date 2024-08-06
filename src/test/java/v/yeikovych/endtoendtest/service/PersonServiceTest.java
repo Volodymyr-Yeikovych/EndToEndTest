@@ -1,12 +1,13 @@
 package v.yeikovych.endtoendtest.service;
 
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import v.yeikovych.endtoendtest.dto.PersonDto;
 import v.yeikovych.endtoendtest.model.Person;
 import v.yeikovych.endtoendtest.repository.PersonRepository;
 
@@ -15,7 +16,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -31,8 +31,12 @@ public class PersonServiceTest {
     @Mock
     PersonRepository personRepository;
 
-    @InjectMocks
     PersonService personService;
+
+    @BeforeEach
+    public void setup() {
+        personService = new PersonService(personRepository, emailService, blacklistService);
+    }
 
     @Test
     public void shouldGetPersonById() {
@@ -43,7 +47,6 @@ public class PersonServiceTest {
 
         assertThat(personService.getById(id)).isEqualTo(person);
         assertThat(captor.getValue()).isEqualTo(id);
-        verify(personRepository).getById(captor.getValue());
     }
 
     @Test
@@ -58,13 +61,40 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void shouldThrowNoSuchElementExceptionIfPersonNotFoundInDb() {
+    public void shouldThrowNoSuchElementExceptionIfPersonNotFoundInRepository() {
         var id = UUID.randomUUID();
         var captor = ArgumentCaptor.forClass(UUID.class);
         when(personRepository.getById(captor.capture())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> personService.getById(id)).isInstanceOf(NoSuchElementException.class);
+        assertThrows(NoSuchElementException.class, () -> personService.getById(id));
         assertThat(captor.getValue()).isEqualTo(id);
-        verify(personRepository).getById(captor.getValue());
+    }
+
+    @Test
+    public void shouldAddPersonToRepository() {
+        var id = UUID.randomUUID();
+        var name = "Vasa";
+        var email = "vasa@gmail.com";
+        var dto = new PersonDto(name, email);
+        var person = new Person(id, name, email);
+        var captor = ArgumentCaptor.forClass(Person.class);
+        when(personRepository.add(captor.capture())).thenReturn(person);
+
+        assertThat(personService.add(dto)).isEqualTo(person);
+        assertThat(captor.getValue().getName()).isEqualTo(name);
+        assertThat(captor.getValue().getEmail()).isEqualTo(email);
+    }
+
+    @Test
+    public void shouldThrowIllegalArgumentExceptionForInvalidEmail() {
+        var name = "Vasa";
+        var email = "vasa5@gmail.com";
+        var dto = new PersonDto(name, email);
+        var captor = ArgumentCaptor.forClass(String.class);
+        when(emailService.isInvalidEmail(captor.capture())).thenReturn(true);
+
+        var exception = assertThrows(IllegalArgumentException.class, () -> personService.add(dto));
+        assertThat(captor.getValue()).isEqualTo(email);
+        assertThat(exception).hasMessage("Invalid email: [" + captor.getValue() + "].");
     }
 }
