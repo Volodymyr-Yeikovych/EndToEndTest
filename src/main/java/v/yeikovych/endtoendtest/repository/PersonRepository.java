@@ -1,8 +1,6 @@
 package v.yeikovych.endtoendtest.repository;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import v.yeikovych.endtoendtest.model.Person;
 
@@ -21,18 +19,16 @@ public class PersonRepository {
         return Optional.ofNullable(PERSON_DB.get(id));
     }
 
-    public Person add(String name, String email) throws IllegalArgumentException {
-        Person person = new Person(nextId++, name, email);
+    public synchronized Person add(Person person) throws IllegalArgumentException {
+        person.setId(nextId++);
 
-        synchronized (PERSON_DB) {
-            if (PERSON_DB.containsKey(person.id())) {
-                log.info("Person [{}] already exists, cannot add.", person);
-                throw new IllegalArgumentException("Person [" + person + "] already exists.");
-            }
-
-            PERSON_DB.put(person.id(), person);
-            log.info("Person [{}] successfully added to db.", person);
-            return person;
+        if (PERSON_DB.containsKey(person.getId())) {
+            log.info("Person [{}] already exists, cannot add.", person);
+            throw new IllegalArgumentException("Person [" + person + "] already exists.");
         }
+
+        PERSON_DB.put(person.getId(), person);
+        log.info("Person [{}] successfully added to db.", person);
+        return person;
     }
 }
