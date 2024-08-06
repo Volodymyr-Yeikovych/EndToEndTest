@@ -1,5 +1,13 @@
 package v.yeikovych.endtoendtest.model;
 
-public record Person(int id, String name, String email) {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class Person {
+    private int id;
+    private String name;
+    private String email;
 
 }
