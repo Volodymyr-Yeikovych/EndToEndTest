@@ -8,6 +8,8 @@ import v.yeikovych.endtoendtest.dto.PersonDto;
 
 import v.yeikovych.endtoendtest.service.PersonService;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1/person")
 @RequiredArgsConstructor
@@ -16,7 +18,7 @@ public class PersonController {
     private final PersonService service;
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getPersonById(@PathVariable int id) {
+    public ResponseEntity<?> getPersonById(@PathVariable UUID id) {
         return ResponseEntity.ok(service.getById(id));
     }
 

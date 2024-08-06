@@ -7,20 +7,20 @@ import v.yeikovych.endtoendtest.model.Person;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @Slf4j
 public class PersonRepository {
 
-    private static final Map<Integer, Person> PERSON_DB = new HashMap<>();
-    private int nextId = 0;
+    private static final Map<UUID, Person> PERSON_DB = new HashMap<>();
 
-    public Optional<Person> getById(int id) {
+    public Optional<Person> getById(UUID id) {
         return Optional.ofNullable(PERSON_DB.get(id));
     }
 
     public synchronized Person add(Person person) throws IllegalArgumentException {
-        person.setId(nextId++);
+        person.setId(UUID.randomUUID());
 
         if (PERSON_DB.containsKey(person.getId())) {
             log.info("Person [{}] already exists, cannot add.", person);
