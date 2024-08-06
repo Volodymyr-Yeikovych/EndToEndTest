@@ -28,12 +28,12 @@ public class PersonService {
         return repository.getById(id).orElseThrow();
     }
 
-    public void add(PersonDto dto) throws IllegalArgumentException {
+    public Person add(PersonDto dto) throws IllegalArgumentException {
         if (emailService.isInvalidEmail(dto.email())) {
             log.info("Person with name and email[{}, {}] was not added, invalid email.", dto.name(), dto.email());
             throw new IllegalArgumentException("Invalid email: [" + dto.email() + "].");
         }
 
-        repository.add(new Person(null, dto.name(), dto.email()));
+        return repository.add(new Person(null, dto.name(), dto.email()));
     }
 }
